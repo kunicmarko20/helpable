@@ -126,4 +126,19 @@ impl GithubClient {
             .json()
             .unwrap()
     }
+
+    pub fn list_pull_requests(
+        &self,
+        repository_name: &str,
+    ) -> Vec<PullRequestPayload> {
+        self.client
+            .get(&format!(
+                "https://api.github.com/repos/{}/pulls",
+                repository_name
+            ))
+            .send()
+            .unwrap()
+            .json()
+            .unwrap()
+    }
 }
