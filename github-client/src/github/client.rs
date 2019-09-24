@@ -141,4 +141,23 @@ impl GithubClient {
             .json()
             .unwrap()
     }
+
+    pub fn approve_pull_requests(
+        &self,
+        repository_name: &str,
+        pull_request_number: u64,
+    ) -> ResultReqwest {
+        self.client
+            .post(&format!(
+                "https://api.github.com/repos/{}/pulls/{}/reviews",
+                repository_name,
+                pull_request_number,
+            ))
+            .body(
+                json!({
+                    "event": "APPROVE",
+                }).to_string()
+            )
+            .send()
+    }
 }

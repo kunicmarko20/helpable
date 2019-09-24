@@ -20,22 +20,10 @@ impl UpdateRelease {
     }
 
     pub fn execute(&self, github_client: GithubClient) {
-        let mut pull_request_number: Option<u64> = self.pull_request_number;
+        let pull_request_number: u64 = self.pull_request_number.unwrap_or_else(|| {
+            Self::choose_pull_request(&github_client)
+        });
 
-        if let None = pull_request_number {
-            let choice = Self::choose_pull_request(&github_client);
-
-            if let Err(message) = choice {
-                println!("{}", message);
-                return;
-            }
-
-            pull_request_number = Some(choice.unwrap());
-        }
-
-        let pull_request_number = pull_request_number.unwrap();
-        dbg!(pull_request_number);
-        unimplemented!();
         let pull_request = github_client.pull_request_info(
             "",
             pull_request_number,

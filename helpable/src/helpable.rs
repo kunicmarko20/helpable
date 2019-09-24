@@ -1,4 +1,4 @@
-use super::command::{Release, UpdateRelease};
+use super::command::{Release, UpdateRelease, ApprovePullRequest};
 
 #[derive(Debug, StructOpt)]
 pub struct Helpable {
@@ -11,6 +11,10 @@ pub enum HelpableSubCommand {
     #[structopt(name = "release")]
     /// Creates a Release PR
     Release(Release),
+    #[structopt(name = "update-release")]
     /// Updates Release PR name
     UpdateRelease(UpdateRelease),
+    #[structopt(name = "approve")]
+    /// Approve PR
+    ApprovePullRequest(ApprovePullRequest),
 }

@@ -19,5 +19,6 @@ fn main() {
     match Helpable::from_args().command {
         HelpableSubCommand::Release(command) => command.execute(github_client),
         HelpableSubCommand::UpdateRelease(command) => command.execute(github_client),
+        HelpableSubCommand::ApprovePullRequest(command) => command.execute(github_client),
     }
 }
