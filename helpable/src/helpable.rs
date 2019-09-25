@@ -1,9 +1,9 @@
-use super::command::{Release, UpdateRelease, Approve, NewestCommitSha, Merge};
+use super::command::{Approve, Merge, NewestCommitSha, Release, UpdateRelease};
 
 #[derive(Debug, StructOpt)]
 pub struct Helpable {
     #[structopt(subcommand)]
-    pub command: HelpableSubCommand
+    pub command: HelpableSubCommand,
 }
 
 #[derive(Debug, StructOpt)]

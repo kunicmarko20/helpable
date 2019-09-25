@@ -6,10 +6,7 @@ pub struct NewestCommitSha {}
 
 impl NewestCommitSha {
     pub fn execute(&self, github_client: GithubClient) {
-        let response = github_client.branch_info(
-            "",
-            "master",
-        );
+        let response = github_client.branch_info("", "master");
 
         println!("{}", response.sha());
     }

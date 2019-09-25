@@ -3,7 +3,7 @@ use crate::github::payload::parts::Error;
 #[derive(Deserialize, Debug)]
 pub struct ErrorPayload {
     message: String,
-    errors: Vec<Error>
+    errors: Vec<Error>,
 }
 
 impl ErrorPayload {

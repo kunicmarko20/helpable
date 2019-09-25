@@ -1,11 +1,11 @@
 use super::payload::PullRequestCommitPayload;
 use super::payload::PullRequestPayload;
+use crate::github::payload::{BranchPayload, ErrorPayload};
 use reqwest::{
     header::{HeaderMap, HeaderValue, AUTHORIZATION},
     Client, Response,
 };
 use std::env;
-use crate::github::payload::{ErrorPayload, BranchPayload};
 
 type ResultReqwest = reqwest::Result<Response>;
 
@@ -34,8 +34,13 @@ impl Default for GithubClient {
 }
 
 impl GithubClient {
-    pub fn create_pull_request(&self, repository_name: &str, body: String) -> Result<PullRequestPayload, ErrorPayload> {
-        let mut response = self.client
+    pub fn create_pull_request(
+        &self,
+        repository_name: &str,
+        body: String,
+    ) -> Result<PullRequestPayload, ErrorPayload> {
+        let mut response = self
+            .client
             .post(&format!(
                 "https://api.github.com/repos/{}/pulls",
                 repository_name
@@ -45,14 +50,10 @@ impl GithubClient {
             .unwrap();
 
         if !response.status().is_success() {
-            return Err(response
-                .json()
-                .unwrap());
+            return Err(response.json().unwrap());
         }
 
-        Ok(response
-            .json()
-            .unwrap())
+        Ok(response.json().unwrap())
     }
 
     pub fn update_pull_request(
@@ -70,7 +71,12 @@ impl GithubClient {
             .send()
     }
 
-    pub fn create_comment(&self, repository_name: &str, issue_number: u64, body: String) -> ResultReqwest {
+    pub fn create_comment(
+        &self,
+        repository_name: &str,
+        issue_number: u64,
+        body: String,
+    ) -> ResultReqwest {
         self.client
             .post(&format!(
                 "https://api.github.com/repos/{}/issues/{}/comments",
@@ -127,10 +133,7 @@ impl GithubClient {
             .unwrap()
     }
 
-    pub fn list_pull_requests(
-        &self,
-        repository_name: &str,
-    ) -> Vec<PullRequestPayload> {
+    pub fn list_pull_requests(&self, repository_name: &str) -> Vec<PullRequestPayload> {
         self.client
             .get(&format!(
                 "https://api.github.com/repos/{}/pulls",
@@ -150,27 +153,22 @@ impl GithubClient {
         self.client
             .post(&format!(
                 "https://api.github.com/repos/{}/pulls/{}/reviews",
-                repository_name,
-                pull_request_number,
+                repository_name, pull_request_number,
             ))
             .body(
                 json!({
                     "event": "APPROVE",
-                }).to_string()
+                })
+                .to_string(),
             )
             .send()
     }
 
-    pub fn branch_info(
-        &self,
-        repository_name: &str,
-        branch: &str,
-    ) ->  BranchPayload {
+    pub fn branch_info(&self, repository_name: &str, branch: &str) -> BranchPayload {
         self.client
             .get(&format!(
                 "https://api.github.com/repos/{}/branches/{}",
-                repository_name,
-                branch,
+                repository_name, branch,
             ))
             .send()
             .unwrap()

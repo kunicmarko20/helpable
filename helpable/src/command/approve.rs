@@ -1,5 +1,5 @@
-use github_client::github::GithubClient;
 use dialoguer::{theme::ColorfulTheme, Select};
+use github_client::github::GithubClient;
 
 #[derive(Debug, Default, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -13,7 +13,7 @@ impl Approve {
     pub fn execute(&self, github_client: GithubClient) {
         let mut pull_request_number: Option<u64> = self.pull_request_number;
 
-        if let None = pull_request_number {
+        if pull_request_number.is_none() {
             let choice = Self::choose_pull_request(&github_client);
 
             if let Err(message) = choice {
@@ -27,17 +27,15 @@ impl Approve {
         let pull_request_number = pull_request_number.unwrap();
 
         github_client
-            .approve_pull_requests(
-                "",
-                pull_request_number,
-            )
+            .approve_pull_requests("", pull_request_number)
             .unwrap();
     }
 
     fn choose_pull_request(github_client: &GithubClient) -> Result<u64, &str> {
         let pull_requests = github_client.list_pull_requests("");
 
-        let selections: Vec<&str> = pull_requests.iter()
+        let selections: Vec<&str> = pull_requests
+            .iter()
             .map(|pull_request| pull_request.title())
             .collect();
 

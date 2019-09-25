@@ -1,6 +1,6 @@
+use dialoguer::{theme::ColorfulTheme, Select};
 use github_client::github::GithubClient;
 use regex::Regex;
-use dialoguer::{theme::ColorfulTheme, Select};
 
 lazy_static! {
     static ref REGEX: Regex = Regex::new(r"\[(?P<ticket>(CARD|LOAN)-\d+)\].*").unwrap();
@@ -16,13 +16,15 @@ pub struct UpdateRelease {
 
 impl UpdateRelease {
     pub fn new(pull_request_number: u64) -> Self {
-        UpdateRelease{pull_request_number: Some(pull_request_number)}
+        UpdateRelease {
+            pull_request_number: Some(pull_request_number),
+        }
     }
 
     pub fn execute(&self, github_client: GithubClient) {
         let mut pull_request_number: Option<u64> = self.pull_request_number;
 
-        if let None = pull_request_number {
+        if pull_request_number.is_none() {
             let choice = Self::choose_pull_request(&github_client);
 
             if let Err(message) = choice {
@@ -35,10 +37,7 @@ impl UpdateRelease {
 
         let pull_request_number = pull_request_number.unwrap();
 
-        let pull_request = github_client.pull_request_info(
-            "",
-            pull_request_number,
-        );
+        let pull_request = github_client.pull_request_info("", pull_request_number);
 
         if !pull_request.is_release() {
             return;
@@ -46,10 +45,7 @@ impl UpdateRelease {
 
         let mut title = "Release".to_string();
 
-        let pull_request_commits = github_client.pull_request_commits(
-            "",
-            pull_request_number,
-        );
+        let pull_request_commits = github_client.pull_request_commits("", pull_request_number);
 
         for pull_request_commit in pull_request_commits {
             if let Some(captures) = REGEX.captures(&pull_request_commit.commit_message()) {
@@ -68,18 +64,15 @@ impl UpdateRelease {
         });
 
         github_client
-            .update_pull_request(
-                "",
-                pull_request_number,
-                body.to_string(),
-            )
+            .update_pull_request("", pull_request_number, body.to_string())
             .unwrap();
     }
 
     fn choose_pull_request(github_client: &GithubClient) -> Result<u64, &str> {
         let pull_requests = github_client.list_pull_requests("");
 
-        let selections: Vec<&str> = pull_requests.iter()
+        let selections: Vec<&str> = pull_requests
+            .iter()
             .filter(|pull_request| pull_request.title().contains("Release"))
             .map(|pull_request| pull_request.title())
             .collect();

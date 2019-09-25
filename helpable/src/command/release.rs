@@ -1,6 +1,6 @@
-use structopt::StructOpt;
-use github_client::github::GithubClient;
 use crate::command::UpdateRelease;
+use github_client::github::GithubClient;
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -15,10 +15,9 @@ impl Release {
             "maintainer_can_modify": true,
         });
 
-        let response = github_client.create_pull_request(
-            "",
-            body.to_string(),
-        ).unwrap();
+        let response = github_client
+            .create_pull_request("", body.to_string())
+            .unwrap();
 
         UpdateRelease::new(response.pull_request_number()).execute(github_client);
     }
