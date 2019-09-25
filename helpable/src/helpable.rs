@@ -1,4 +1,4 @@
-use super::command::{Release, UpdateRelease, Approve};
+use super::command::{Release, UpdateRelease, Approve, NewestCommitSha};
 
 #[derive(Debug, StructOpt)]
 pub struct Helpable {
@@ -14,4 +14,7 @@ pub enum HelpableSubCommand {
     UpdateRelease(UpdateRelease),
     /// Approve PR
     Approve(Approve),
+    #[structopt(name = "sha")]
+    /// Newest Commit Sha
+    NewestCommitSha(NewestCommitSha),
 }

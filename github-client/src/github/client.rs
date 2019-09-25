@@ -5,7 +5,7 @@ use reqwest::{
     Client, Response,
 };
 use std::env;
-use crate::github::payload::ErrorPayload;
+use crate::github::payload::{ErrorPayload, BranchPayload};
 
 type ResultReqwest = reqwest::Result<Response>;
 
@@ -159,5 +159,22 @@ impl GithubClient {
                 }).to_string()
             )
             .send()
+    }
+
+    pub fn branch_info(
+        &self,
+        repository_name: &str,
+        branch: &str,
+    ) ->  BranchPayload {
+        self.client
+            .get(&format!(
+                "https://api.github.com/repos/{}/branches/{}",
+                repository_name,
+                branch,
+            ))
+            .send()
+            .unwrap()
+            .json()
+            .unwrap()
     }
 }

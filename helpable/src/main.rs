@@ -20,5 +20,6 @@ fn main() {
         HelpableSubCommand::Release(command) => command.execute(github_client),
         HelpableSubCommand::UpdateRelease(command) => command.execute(github_client),
         HelpableSubCommand::Approve(command) => command.execute(github_client),
+        HelpableSubCommand::NewestCommitSha(command) => command.execute(github_client),
     }
 }

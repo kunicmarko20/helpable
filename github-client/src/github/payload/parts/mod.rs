@@ -1,4 +1,5 @@
 mod base;
+mod branch_commit;
 mod comment;
 mod commit;
 mod error;
@@ -8,6 +9,7 @@ mod pull_request;
 mod repository;
 
 pub use base::Base;
+pub use branch_commit::BranchCommit;
 pub use comment::Comment;
 pub use commit::Commit;
 pub use head::Head;
