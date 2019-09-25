@@ -3,15 +3,17 @@ use dialoguer::{theme::ColorfulTheme, Select};
 
 #[derive(Debug, Default, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
-pub struct ApprovePullRequest {
+pub struct Approve {
     #[structopt(short = "pr", long = "pull_request_number")]
     /// Number of the Pull Request to update
     pub pull_request_number: Option<u64>,
 }
 
-impl ApprovePullRequest {
+impl Approve {
     pub fn execute(&self, github_client: GithubClient) {
-        let pull_request_number: u64 = self.pull_request_number.unwrap_or_else(|| {
+        let mut pull_request_number: Option<u64> = self.pull_request_number;
+
+        if let None = pull_request_number {
             let choice = Self::choose_pull_request(&github_client);
 
             if let Err(message) = choice {
@@ -19,8 +21,10 @@ impl ApprovePullRequest {
                 return;
             }
 
-            return choice.unwrap();
-        });
+            pull_request_number = Some(choice.unwrap());
+        }
+
+        let pull_request_number = pull_request_number.unwrap();
 
         github_client
             .approve_pull_requests(
