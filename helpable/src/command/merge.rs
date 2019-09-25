@@ -1,4 +1,5 @@
-use dialoguer::{theme::ColorfulTheme, Select};
+use super::ChoosablePullRequest;
+use super::Command;
 use github_client::github::GithubClient;
 use github_client::github::MergeMethod;
 use structopt::StructOpt;
@@ -11,22 +12,12 @@ pub struct Merge {
     pub pull_request_number: Option<u64>,
 }
 
-impl Merge {
-    pub fn execute(&self, github_client: GithubClient) {
-        let mut pull_request_number: Option<u64> = self.pull_request_number;
+impl ChoosablePullRequest for Merge {}
 
-        if pull_request_number.is_none() {
-            let choice = Self::choose_pull_request(&github_client);
-
-            if let Err(message) = choice {
-                println!("{}", message);
-                return;
-            }
-
-            pull_request_number = Some(choice.unwrap());
-        }
-
-        let pull_request_number = pull_request_number.unwrap();
+impl Command for Merge {
+    fn execute(&self, github_client: GithubClient) -> Result<(), String> {
+        let pull_request_number: u64 =
+            Self::pull_request_number(self.pull_request_number, &github_client)?;
 
         let pull_request = github_client.pull_request_info("", pull_request_number);
 
@@ -46,34 +37,9 @@ impl Merge {
             .unwrap();
 
         if response.status() == 405 {
-            println!("Unable to merge, did you try to approve pull request?");
-        }
-    }
-
-    fn choose_pull_request(github_client: &GithubClient) -> Result<u64, &str> {
-        let pull_requests = github_client.list_pull_requests("");
-
-        let selections: Vec<&str> = pull_requests
-            .iter()
-            .map(|pull_request| pull_request.title())
-            .collect();
-
-        if selections.is_empty() {
-            return Err("No Pull Requests found in repository.");
+            return Err("Unable to merge, did you try to approve pull request?".to_string());
         }
 
-        let selected = Select::with_theme(&ColorfulTheme::default())
-            .with_prompt("Choose Pull Request:")
-            .items(&selections[..])
-            .interact()
-            .unwrap();
-
-        let selected_title = selections[selected];
-
-        Ok(pull_requests
-            .iter()
-            .find(|pull_request| pull_request.title() == selected_title)
-            .expect("Unable to find matching Pull Request.")
-            .pull_request_number())
+        Ok(())
     }
 }
