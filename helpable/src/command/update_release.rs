@@ -10,7 +10,6 @@ lazy_static! {
 #[derive(Debug, Default, StructOpt, ChoosablePullRequest)]
 #[structopt(rename_all = "kebab-case")]
 pub struct UpdateRelease {
-    #[structopt(short = "pr", long = "pull_request_number")]
     /// Number of the Pull Request to update
     pub pull_request_number: Option<u64>,
 }
