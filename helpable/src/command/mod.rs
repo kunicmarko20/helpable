@@ -1,12 +1,10 @@
 pub mod approve;
-mod choosable_pull_request;
 pub mod merge;
 pub mod newest_commit_sha;
 pub mod release;
 pub mod update_release;
 
 pub use approve::Approve;
-use choosable_pull_request::ChoosablePullRequest;
 use github_client::github::GithubClient;
 pub use merge::Merge;
 pub use newest_commit_sha::NewestCommitSha;

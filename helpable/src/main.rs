@@ -5,8 +5,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate lazy_static;
 
-pub use crate::pull_request_chooser::PullRequestChooser;
-
 use crate::command::Command;
 use crate::helpable::Helpable;
 use crate::helpable::HelpableSubCommand;
@@ -15,7 +13,6 @@ use github_client::github::GithubClient;
 
 mod command;
 mod helpable;
-mod pull_request_chooser;
 
 fn main() {
     let github_client = GithubClient::default();

@@ -1,21 +1,19 @@
-use super::ChoosablePullRequest;
 use super::Command;
 use github_client::github::GithubClient;
+use helpable_derive::ChoosablePullRequest;
 use regex::Regex;
 
 lazy_static! {
     static ref REGEX: Regex = Regex::new(r"\[(?P<ticket>(CARD|LOAN)-\d+)\].*").unwrap();
 }
 
-#[derive(Debug, Default, StructOpt)]
+#[derive(Debug, Default, StructOpt, ChoosablePullRequest)]
 #[structopt(rename_all = "kebab-case")]
 pub struct UpdateRelease {
     #[structopt(short = "pr", long = "pull_request_number")]
     /// Number of the Pull Request to update
     pub pull_request_number: Option<u64>,
 }
-
-impl ChoosablePullRequest for UpdateRelease {}
 
 impl UpdateRelease {
     pub fn new(pull_request_number: u64) -> Self {

@@ -1,18 +1,16 @@
-use super::ChoosablePullRequest;
 use super::Command;
 use github_client::github::GithubClient;
 use github_client::github::MergeMethod;
+use helpable_derive::ChoosablePullRequest;
 use structopt::StructOpt;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, StructOpt, ChoosablePullRequest)]
 #[structopt(rename_all = "kebab-case")]
 pub struct Merge {
     #[structopt(short = "pr", long = "pull_request_number")]
     /// Number of the Pull Request to update
     pub pull_request_number: Option<u64>,
 }
-
-impl ChoosablePullRequest for Merge {}
 
 impl Command for Merge {
     fn execute(&self, github_client: GithubClient) -> Result<(), String> {
