@@ -6,7 +6,7 @@ extern crate serde_json;
 extern crate lazy_static;
 
 use crate::command::Command;
-use crate::helpable::Helpable;
+use crate::helpable::{Helpable, ConfigSubCommand};
 use crate::helpable::HelpableSubCommand;
 use crate::structopt::StructOpt;
 use github_client::github::GithubClient;
@@ -23,6 +23,10 @@ fn main() {
         HelpableSubCommand::Approve(command) => command.execute(github_client),
         HelpableSubCommand::NewestCommitSha(command) => command.execute(github_client),
         HelpableSubCommand::Merge(command) => command.execute(github_client),
+        HelpableSubCommand::Config{ command} => match command {
+            ConfigSubCommand::List(command) => command.execute(),
+            ConfigSubCommand::Set(command) => command.execute(),
+        },
     };
 
     if let Err(message) = result {

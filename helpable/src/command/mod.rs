@@ -3,6 +3,7 @@ pub mod merge;
 pub mod newest_commit_sha;
 pub mod release;
 pub mod update_release;
+pub mod config;
 
 pub use approve::Approve;
 use github_client::github::GithubClient;
