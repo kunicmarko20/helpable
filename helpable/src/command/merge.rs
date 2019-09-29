@@ -14,7 +14,7 @@ pub struct Merge {
 impl Command for Merge {
     fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
         let pull_request_number: u64 =
-            Self::pull_request_number(self.pull_request_number, &github_client)?;
+            Self::pull_request_number(self.pull_request_number, &github_client, repository_name)?;
 
         let pull_request = github_client.pull_request_info(repository_name, pull_request_number);
 

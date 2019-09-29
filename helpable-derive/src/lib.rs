@@ -20,17 +20,18 @@ fn impl_choosable_pull_request(ast: &DeriveInput) -> TokenStream {
             fn pull_request_number(
                 pull_request_number: Option<u64>,
                 github_client: &github_client::github::GithubClient,
+                repository_name: &str,
             ) -> Result<u64, String> {
                 if pull_request_number.is_none() {
-                    return Self::choose(&github_client)
+                    return Self::choose(&github_client, repository_name)
                         .and_then(|pull_request| Ok(pull_request.pull_request_number()));
                 }
 
                 Ok(pull_request_number.unwrap())
             }
 
-            fn choose(github_client: &github_client::github::GithubClient) -> Result<github_client::github::payload::PullRequestPayload, String> {
-                let pull_requests = github_client.list_pull_requests("");
+            fn choose(github_client: &github_client::github::GithubClient, repository_name: &str) -> Result<github_client::github::payload::PullRequestPayload, String> {
+                let pull_requests = github_client.list_pull_requests(repository_name);
 
                 let selections: Vec<&str> = pull_requests
                     .iter()

@@ -9,18 +9,18 @@ pub struct Helpable {
 
 #[derive(Debug, StructOpt)]
 pub enum HelpableSubCommand {
-    /// Creates a Release PR
+    /// Create a Release pull request
     Release(Release),
-    /// Updates Release PR name
+    /// Update Release pull request name
     UpdateRelease(UpdateRelease),
-    /// Approve PR
+    /// Approve pull request
     Approve(Approve),
     #[structopt(name = "sha")]
     /// Newest Commit Sha
     NewestCommitSha(NewestCommitSha),
-    /// Merge Pull Request
+    /// Merge pull request
     Merge(Merge),
-    /// Config
+    /// Set or view config values
     Config {
         #[structopt(subcommand)]
         command: ConfigSubCommand,
