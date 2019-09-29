@@ -23,11 +23,11 @@ impl UpdateRelease {
 }
 
 impl Command for UpdateRelease {
-    fn execute(&self, github_client: GithubClient) -> Result<(), String> {
+    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client)?;
 
-        let pull_request = github_client.pull_request_info("", pull_request_number);
+        let pull_request = github_client.pull_request_info(repository_name, pull_request_number);
 
         if !pull_request.is_release() {
             return Err("Not a release Pull Request.".to_string());
@@ -35,7 +35,8 @@ impl Command for UpdateRelease {
 
         let mut title = "Release".to_string();
 
-        let pull_request_commits = github_client.pull_request_commits("", pull_request_number);
+        let pull_request_commits =
+            github_client.pull_request_commits(repository_name, pull_request_number);
 
         for pull_request_commit in pull_request_commits {
             if let Some(captures) = REGEX.captures(&pull_request_commit.commit_message()) {
@@ -54,7 +55,7 @@ impl Command for UpdateRelease {
         });
 
         github_client
-            .update_pull_request("", pull_request_number, body.to_string())
+            .update_pull_request(repository_name, pull_request_number, body.to_string())
             .unwrap();
 
         Ok(())

@@ -6,8 +6,8 @@ use github_client::github::GithubClient;
 pub struct NewestCommitSha {}
 
 impl Command for NewestCommitSha {
-    fn execute(&self, github_client: GithubClient) -> Result<(), String> {
-        let response = github_client.branch_info("", "master");
+    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
+        let response = github_client.branch_info(repository_name, "master");
 
         println!("{}", response.sha());
 

@@ -1,3 +1,4 @@
+use super::command::config::{List, Set};
 use super::command::{Approve, Merge, NewestCommitSha, Release, UpdateRelease};
 
 #[derive(Debug, StructOpt)]
@@ -19,4 +20,17 @@ pub enum HelpableSubCommand {
     NewestCommitSha(NewestCommitSha),
     /// Merge Pull Request
     Merge(Merge),
+    /// Config
+    Config {
+        #[structopt(subcommand)]
+        command: ConfigSubCommand,
+    },
+}
+
+#[derive(Debug, StructOpt)]
+pub enum ConfigSubCommand {
+    /// Lists config values
+    List(List),
+    /// Set new config value
+    Set(Set),
 }

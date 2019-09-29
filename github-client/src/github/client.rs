@@ -5,35 +5,26 @@ use reqwest::{
     header::{HeaderMap, HeaderValue, AUTHORIZATION},
     Client, Response,
 };
-use std::env;
 
 type ResultReqwest = reqwest::Result<Response>;
-
-lazy_static! {
-    static ref TOKEN: String =
-        env::var("APP_GITHUB_API_TOKEN").expect("APP_GITHUB_API_TOKEN not set.");
-    static ref AUTHORIZATION_HEADER_VALUE: String = "token ".to_string() + &TOKEN;
-}
 
 pub struct GithubClient {
     client: Client,
 }
 
-impl Default for GithubClient {
-    fn default() -> Self {
+impl GithubClient {
+    pub fn new(token: String) -> Self {
         let mut headers = HeaderMap::new();
         headers.insert(
             AUTHORIZATION,
-            HeaderValue::from_static(&AUTHORIZATION_HEADER_VALUE),
+            HeaderValue::from_bytes(("token ".to_string() + &token).as_bytes()).unwrap(),
         );
 
         let client = Client::builder().default_headers(headers).build().unwrap();
 
         GithubClient { client }
     }
-}
 
-impl GithubClient {
     pub fn create_pull_request(
         &self,
         repository_name: &str,

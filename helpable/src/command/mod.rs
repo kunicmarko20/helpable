@@ -1,4 +1,5 @@
 pub mod approve;
+pub mod config;
 pub mod merge;
 pub mod newest_commit_sha;
 pub mod release;
@@ -12,5 +13,5 @@ pub use release::Release;
 pub use update_release::UpdateRelease;
 
 pub trait Command {
-    fn execute(&self, github_client: GithubClient) -> Result<(), String>;
+    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String>;
 }
