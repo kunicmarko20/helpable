@@ -11,12 +11,12 @@ pub struct Approve {
 }
 
 impl Command for Approve {
-    fn execute(&self, github_client: GithubClient) -> Result<(), String> {
+    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client)?;
 
         github_client
-            .approve_pull_requests("", pull_request_number)
+            .approve_pull_requests(repository_name, pull_request_number)
             .unwrap();
 
         Ok(())

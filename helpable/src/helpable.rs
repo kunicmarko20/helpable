@@ -1,5 +1,5 @@
-use super::command::{Approve, Merge, NewestCommitSha, Release, UpdateRelease};
 use super::command::config::{List, Set};
+use super::command::{Approve, Merge, NewestCommitSha, Release, UpdateRelease};
 
 #[derive(Debug, StructOpt)]
 pub struct Helpable {
@@ -24,7 +24,7 @@ pub enum HelpableSubCommand {
     Config {
         #[structopt(subcommand)]
         command: ConfigSubCommand,
-    }
+    },
 }
 
 #[derive(Debug, StructOpt)]

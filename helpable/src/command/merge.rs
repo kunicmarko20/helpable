@@ -13,11 +13,11 @@ pub struct Merge {
 }
 
 impl Command for Merge {
-    fn execute(&self, github_client: GithubClient) -> Result<(), String> {
+    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client)?;
 
-        let pull_request = github_client.pull_request_info("", pull_request_number);
+        let pull_request = github_client.pull_request_info(repository_name, pull_request_number);
 
         let body = if pull_request.is_release() || pull_request.is_back_merge() {
             json!({
@@ -31,7 +31,7 @@ impl Command for Merge {
         };
 
         let response = github_client
-            .merge_pull_request("", pull_request_number, body.to_string())
+            .merge_pull_request(repository_name, pull_request_number, body.to_string())
             .unwrap();
 
         if response.status() == 405 {
