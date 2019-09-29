@@ -13,10 +13,9 @@ impl NewestCommitSha {
         github_client: GithubClient,
         repository_name: &str,
     ) -> Result<(), String> {
-
         let response = github_client.branch_info(
             repository_name,
-            &self.branch.clone().unwrap_or("master".to_string())
+            &self.branch.clone().unwrap_or("master".to_string()),
         );
 
         println!("{}", response.sha());
