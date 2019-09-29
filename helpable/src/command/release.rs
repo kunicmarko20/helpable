@@ -1,4 +1,3 @@
-use super::Command;
 use crate::command::UpdateRelease;
 use github_client::github::GithubClient;
 use structopt::StructOpt;
@@ -7,8 +6,13 @@ use structopt::StructOpt;
 #[structopt(rename_all = "kebab-case")]
 pub struct Release {}
 
-impl Command for Release {
-    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
+impl Release {
+    pub fn execute(
+        &self,
+        github_client: GithubClient,
+        repository_name: &str,
+        ticket_prefix: &str,
+    ) -> Result<(), String> {
         let body = json!({
             "title": "Release",
             "head": "development",
@@ -20,8 +24,11 @@ impl Command for Release {
             .create_pull_request(repository_name, body.to_string())
             .unwrap();
 
-        UpdateRelease::new(response.pull_request_number())
-            .execute(github_client, repository_name)?;
+        UpdateRelease::new(response.pull_request_number()).execute(
+            github_client,
+            repository_name,
+            ticket_prefix,
+        )?;
 
         Ok(())
     }

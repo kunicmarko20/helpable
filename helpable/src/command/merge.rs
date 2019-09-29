@@ -1,4 +1,3 @@
-use super::Command;
 use github_client::github::GithubClient;
 use github_client::github::MergeMethod;
 use helpable_derive::ChoosablePullRequest;
@@ -11,8 +10,12 @@ pub struct Merge {
     pub pull_request_number: Option<u64>,
 }
 
-impl Command for Merge {
-    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
+impl Merge {
+    pub fn execute(
+        &self,
+        github_client: GithubClient,
+        repository_name: &str,
+    ) -> Result<(), String> {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client, repository_name)?;
 

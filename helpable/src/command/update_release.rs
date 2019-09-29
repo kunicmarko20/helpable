@@ -1,11 +1,6 @@
-use super::Command;
 use github_client::github::GithubClient;
 use helpable_derive::ChoosablePullRequest;
 use regex::Regex;
-
-lazy_static! {
-    static ref REGEX: Regex = Regex::new(r"\[(?P<ticket>(CARD|LOAN)-\d+)\].*").unwrap();
-}
 
 #[derive(Debug, Default, StructOpt, ChoosablePullRequest)]
 #[structopt(rename_all = "kebab-case")]
@@ -22,8 +17,13 @@ impl UpdateRelease {
     }
 }
 
-impl Command for UpdateRelease {
-    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
+impl UpdateRelease {
+    pub fn execute(
+        &self,
+        github_client: GithubClient,
+        repository_name: &str,
+        ticket_prefix: &str,
+    ) -> Result<(), String> {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client, repository_name)?;
         let pull_request = github_client.pull_request_info(repository_name, pull_request_number);
@@ -37,8 +37,10 @@ impl Command for UpdateRelease {
         let pull_request_commits =
             github_client.pull_request_commits(repository_name, pull_request_number);
 
+        let regex = Regex::new(&format!("\\[(?P<ticket>{}-\\d+)\\].*", ticket_prefix)).unwrap();
+
         for pull_request_commit in pull_request_commits {
-            if let Some(captures) = REGEX.captures(&pull_request_commit.commit_message()) {
+            if let Some(captures) = regex.captures(&pull_request_commit.commit_message()) {
                 if let Some(ticket) = captures.name("ticket") {
                     title = title + " " + ticket.as_str();
                 }
@@ -63,16 +65,18 @@ impl Command for UpdateRelease {
 
 #[cfg(test)]
 mod tests {
-    use super::REGEX;
+    use regex::Regex;
 
     #[test]
     fn it_will_match_regex() {
-        let captures = REGEX.captures("[CARD-321] this is a pr").unwrap();
+        let regex = Regex::new(&format!("\\[(?P<ticket>{}-\\d+)\\].*", "(TEST|PROJECT)")).unwrap();
 
-        assert!(captures.name("ticket").unwrap().as_str() == "CARD-321");
+        let captures = regex.captures("[TEST-321] this is a pr").unwrap();
 
-        let captures = REGEX.captures("[LOAN-321] this is a pr").unwrap();
+        assert!(captures.name("ticket").unwrap().as_str() == "TEST-321");
 
-        assert!(captures.name("ticket").unwrap().as_str() == "LOAN-321");
+        let captures = regex.captures("[PROJECT-321] this is a pr").unwrap();
+
+        assert!(captures.name("ticket").unwrap().as_str() == "PROJECT-321");
     }
 }

@@ -3,11 +3,8 @@ extern crate structopt;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
-extern crate lazy_static;
-#[macro_use]
 extern crate text_io;
 
-use crate::command::Command;
 use crate::config::Config;
 use crate::helpable::HelpableSubCommand;
 use crate::helpable::{ConfigSubCommand, Helpable};
@@ -23,11 +20,14 @@ fn main() {
     let github_client = GithubClient::new(config.get("github_access_token"));
 
     let repository_name = config.get("repository_name");
+    let ticket_prefix = config.get("ticket_prefix");
 
     let result = match Helpable::from_args().command {
-        HelpableSubCommand::Release(command) => command.execute(github_client, &repository_name),
+        HelpableSubCommand::Release(command) => {
+            command.execute(github_client, &repository_name, &ticket_prefix)
+        }
         HelpableSubCommand::UpdateRelease(command) => {
-            command.execute(github_client, &repository_name)
+            command.execute(github_client, &repository_name, &ticket_prefix)
         }
         HelpableSubCommand::Approve(command) => command.execute(github_client, &repository_name),
         HelpableSubCommand::NewestCommitSha(command) => {

@@ -1,4 +1,3 @@
-use super::Command;
 use github_client::github::GithubClient;
 use helpable_derive::ChoosablePullRequest;
 
@@ -9,8 +8,12 @@ pub struct Approve {
     pub pull_request_number: Option<u64>,
 }
 
-impl Command for Approve {
-    fn execute(&self, github_client: GithubClient, repository_name: &str) -> Result<(), String> {
+impl Approve {
+    pub fn execute(
+        &self,
+        github_client: GithubClient,
+        repository_name: &str,
+    ) -> Result<(), String> {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client, repository_name)?;
 
