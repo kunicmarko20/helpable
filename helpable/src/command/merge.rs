@@ -27,7 +27,7 @@ impl Merge {
             })
         } else {
             json!({
-                "commit_title": pull_request.title(),
+                "commit_title": pull_request.title().to_string() + &format!(" (#{})", pull_request_number),
                 "merge_method": Into::<&str>::into(MergeMethod::Squash),
             })
         };
