@@ -1,3 +1,5 @@
+use crate::config::Config;
+use github_client::github::payload::PullRequestPayload;
 use github_client::github::GithubClient;
 use github_client::github::MergeMethod;
 use helpable_derive::ChoosablePullRequest;
@@ -11,17 +13,15 @@ pub struct Merge {
 }
 
 impl Merge {
-    pub fn execute(
-        &self,
-        github_client: GithubClient,
-        repository_name: &str,
-    ) -> Result<(), String> {
+    pub fn execute(&self, github_client: GithubClient, mut config: Config) -> Result<(), String> {
+        let repository_name = config.get("repository_name");
+
         let pull_request_number: u64 =
-            Self::pull_request_number(self.pull_request_number, &github_client, repository_name)?;
+            Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
 
-        let pull_request = github_client.pull_request_info(repository_name, pull_request_number);
+        let pull_request = github_client.pull_request_info(&repository_name, pull_request_number);
 
-        let body = if pull_request.is_release() || pull_request.is_back_merge() {
+        let body = if Self::should_create_merge_commit(&mut config, &pull_request) {
             json!({
                 "merge_method": Into::<&str>::into(MergeMethod::Merge),
             })
@@ -33,7 +33,7 @@ impl Merge {
         };
 
         let response = github_client
-            .merge_pull_request(repository_name, pull_request_number, body.to_string())
+            .merge_pull_request(&repository_name, pull_request_number, body.to_string())
             .unwrap();
 
         if response.status() == 405 {
@@ -41,5 +41,15 @@ impl Merge {
         }
 
         Ok(())
+    }
+
+    fn should_create_merge_commit(config: &mut Config, pull_request: &PullRequestPayload) -> bool {
+        pull_request.is_release(
+            config.get("release_branch"),
+            config.get("development_branch"),
+        ) || pull_request.is_back_merge(
+            config.get("release_branch"),
+            config.get("development_branch"),
+        )
     }
 }

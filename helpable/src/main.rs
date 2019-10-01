@@ -19,21 +19,12 @@ fn main() {
     let mut config = Config::new();
     let github_client = GithubClient::new(config.get("github_access_token"));
 
-    let repository_name = config.get("repository_name");
-    let ticket_prefix = config.get("ticket_prefix");
-
     let result = match Helpable::from_args().command {
-        HelpableSubCommand::Release(command) => {
-            command.execute(github_client, &repository_name, &ticket_prefix)
-        }
-        HelpableSubCommand::UpdateRelease(command) => {
-            command.execute(github_client, &repository_name, &ticket_prefix)
-        }
-        HelpableSubCommand::Approve(command) => command.execute(github_client, &repository_name),
-        HelpableSubCommand::NewestCommitSha(command) => {
-            command.execute(github_client, &repository_name)
-        }
-        HelpableSubCommand::Merge(command) => command.execute(github_client, &repository_name),
+        HelpableSubCommand::Release(command) => command.execute(github_client, config),
+        HelpableSubCommand::UpdateRelease(command) => command.execute(github_client, config),
+        HelpableSubCommand::Approve(command) => command.execute(github_client, config),
+        HelpableSubCommand::NewestCommitSha(command) => command.execute(github_client, config),
+        HelpableSubCommand::Merge(command) => command.execute(github_client, config),
         HelpableSubCommand::Config { command } => match command {
             ConfigSubCommand::List(command) => command.execute(config),
             ConfigSubCommand::Set(mut command) => command.execute(config),

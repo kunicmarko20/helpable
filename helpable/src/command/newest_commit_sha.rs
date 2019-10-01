@@ -1,3 +1,4 @@
+use crate::config::Config;
 use github_client::github::GithubClient;
 
 #[derive(Debug, Default, StructOpt)]
@@ -8,14 +9,13 @@ pub struct NewestCommitSha {
 }
 
 impl NewestCommitSha {
-    pub fn execute(
-        &self,
-        github_client: GithubClient,
-        repository_name: &str,
-    ) -> Result<(), String> {
+    pub fn execute(&self, github_client: GithubClient, mut config: Config) -> Result<(), String> {
         let response = github_client.branch_info(
-            repository_name,
-            &self.branch.clone().unwrap_or_else(|| "master".to_string()),
+            &config.get("repository_name"),
+            &self
+                .branch
+                .clone()
+                .unwrap_or_else(|| config.get("release_branch")),
         );
 
         println!("{}", response.sha());

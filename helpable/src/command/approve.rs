@@ -1,3 +1,4 @@
+use crate::config::Config;
 use github_client::github::GithubClient;
 use helpable_derive::ChoosablePullRequest;
 
@@ -9,16 +10,14 @@ pub struct Approve {
 }
 
 impl Approve {
-    pub fn execute(
-        &self,
-        github_client: GithubClient,
-        repository_name: &str,
-    ) -> Result<(), String> {
+    pub fn execute(&self, github_client: GithubClient, mut config: Config) -> Result<(), String> {
+        let repository_name = config.get("repository_name");
+
         let pull_request_number: u64 =
-            Self::pull_request_number(self.pull_request_number, &github_client, repository_name)?;
+            Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
 
         github_client
-            .approve_pull_requests(repository_name, pull_request_number)
+            .approve_pull_requests(&repository_name, pull_request_number)
             .unwrap();
 
         Ok(())
