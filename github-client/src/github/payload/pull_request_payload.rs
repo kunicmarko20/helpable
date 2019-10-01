@@ -14,7 +14,7 @@ impl PullRequestPayload {
     }
 
     pub fn is_back_merge(&self, release_branch: String, development_branch: String) -> bool {
-        self.base.branch == release_branch && self.head.branch == development_branch
+        self.base.branch == development_branch && self.head.branch == release_branch
     }
 
     pub fn pull_request_number(&self) -> u64 {
