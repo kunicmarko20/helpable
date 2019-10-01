@@ -8,7 +8,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt, ChoosablePullRequest)]
 #[structopt(rename_all = "kebab-case")]
 pub struct Merge {
-    /// Number of the Pull Request to update
+    /// Number of the pull request to update
     pub pull_request_number: Option<u64>,
 }
 
