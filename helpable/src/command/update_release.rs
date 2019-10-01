@@ -6,7 +6,7 @@ use regex::Regex;
 #[derive(Debug, Default, StructOpt, ChoosablePullRequest)]
 #[structopt(rename_all = "kebab-case")]
 pub struct UpdateRelease {
-    /// Number of the Pull Request to update
+    /// Number of the pull request to update
     pub pull_request_number: Option<u64>,
 }
 

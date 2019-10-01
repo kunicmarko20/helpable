@@ -13,12 +13,12 @@ pub enum HelpableSubCommand {
     Release(Release),
     /// Update Release pull request name
     UpdateRelease(UpdateRelease),
-    /// Approve pull request
+    /// Approve a pull request
     Approve(Approve),
     #[structopt(name = "sha")]
-    /// Newest Commit Sha
+    /// Get newest Commit Sha
     NewestCommitSha(NewestCommitSha),
-    /// Merge pull request
+    /// Merge a pull request
     Merge(Merge),
     /// Set or view config values
     Config {
@@ -29,8 +29,8 @@ pub enum HelpableSubCommand {
 
 #[derive(Debug, StructOpt)]
 pub enum ConfigSubCommand {
-    /// Lists config values
+    /// Show all current config values
     List(List),
-    /// Set new config value
+    /// Set or replace a config value
     Set(Set),
 }
