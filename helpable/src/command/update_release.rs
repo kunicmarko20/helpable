@@ -33,16 +33,40 @@ impl UpdateRelease {
             return Err("Not a release Pull Request.".to_string());
         }
 
+        let new_title = Self::new_release_title(
+            &github_client,
+            &repository_name,
+            pull_request_number,
+            config.get("ticket_prefix"),
+        );
+
+        if pull_request.title() == new_title {
+            return Err("Nothing to update.".to_string());
+        }
+
+        let body = json!({
+            "title": new_title,
+        });
+
+        github_client
+            .update_pull_request(&repository_name, pull_request_number, body.to_string())
+            .unwrap();
+
+        Ok(())
+    }
+
+    fn new_release_title(
+        github_client: &GithubClient,
+        repository_name: &str,
+        pull_request_number: u64,
+        ticket_prefix: String,
+    ) -> String {
         let mut title = "Release".to_string();
 
         let pull_request_commits =
             github_client.pull_request_commits(&repository_name, pull_request_number);
 
-        let regex = Regex::new(&format!(
-            "\\[(?P<ticket>{}-\\d+)\\].*",
-            config.get("ticket_prefix")
-        ))
-        .unwrap();
+        let regex = Regex::new(&format!("\\[(?P<ticket>{}-\\d+)\\].*", ticket_prefix)).unwrap();
 
         for pull_request_commit in pull_request_commits {
             if let Some(captures) = regex.captures(&pull_request_commit.commit_message()) {
@@ -52,19 +76,7 @@ impl UpdateRelease {
             }
         }
 
-        if pull_request.title() == title {
-            return Err("Nothing to update.".to_string());
-        }
-
-        let body = json!({
-            "title": title.as_str(),
-        });
-
-        github_client
-            .update_pull_request(&repository_name, pull_request_number, body.to_string())
-            .unwrap();
-
-        Ok(())
+        title
     }
 }
 
