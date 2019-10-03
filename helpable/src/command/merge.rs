@@ -2,10 +2,10 @@ use crate::config::Config;
 use github_client::github::payload::PullRequestPayload;
 use github_client::github::GithubClient;
 use github_client::github::MergeMethod;
-use helpable_derive::ChoosablePullRequest;
+use helpable_derive::{ChoosablePullRequest, Confirmation};
 use structopt::StructOpt;
 
-#[derive(Debug, StructOpt, ChoosablePullRequest)]
+#[derive(Debug, StructOpt, ChoosablePullRequest, Confirmation)]
 #[structopt(rename_all = "kebab-case")]
 pub struct Merge {
     /// Number of the pull request to update
@@ -31,6 +31,11 @@ impl Merge {
                 "merge_method": Into::<&str>::into(MergeMethod::Squash),
             })
         };
+
+        Self::confirmation(&format!(
+            "You are about to merge \"{}\", are you sure?",
+            pull_request.title().to_string()
+        ))?;
 
         let response = github_client
             .merge_pull_request(&repository_name, pull_request_number, body.to_string())
