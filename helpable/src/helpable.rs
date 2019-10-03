@@ -1,5 +1,5 @@
 use super::command::config::{List, Set};
-use super::command::{Approve, Merge, NewestCommitSha, Release, UpdateRelease};
+use super::command::{Approve, Merge, NewestCommitSha, Release, Search, UpdateRelease};
 
 #[derive(Debug, StructOpt)]
 pub struct Helpable {
@@ -20,6 +20,8 @@ pub enum HelpableSubCommand {
     NewestCommitSha(NewestCommitSha),
     /// Merge a pull request
     Merge(Merge),
+    /// Search pull requests by term and open chosen one in default browser
+    Search(Search),
     /// Set or view config values
     Config {
         #[structopt(subcommand)]

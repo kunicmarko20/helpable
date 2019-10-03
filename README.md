@@ -17,6 +17,7 @@ SUBCOMMANDS:
     config            Set or view config values
     merge             Merge pull request
     release           Create a Release pull request
+    search            Search pull requests by term and open chosen one in default browser
     sha               Newest Commit Sha
     update-release    Update Release pull request name
 ```
@@ -46,6 +47,7 @@ be saved for future.
     * [set](#set)
 * [merge](#merge)
 * [release](#release)
+* [search](#search)
 * [sha](#sha)
 * [update-release](#update-release)
 
@@ -125,9 +127,24 @@ Create a Release pull request
 USAGE:
     helpable release
 ```
+
+### search
+
+```
+Search pull requests by term and open chosen one in default browser
+
+USAGE:
+    helpable search <term>
+
+ARGS:
+    <term>    Term to search for
+```
+
 ### sha
 
 ```
+Get newest Commit Sha
+
 USAGE:
     helpable sha [branch]
 

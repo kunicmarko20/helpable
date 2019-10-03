@@ -25,6 +25,7 @@ fn main() {
         HelpableSubCommand::Approve(command) => command.execute(github_client, config),
         HelpableSubCommand::NewestCommitSha(command) => command.execute(github_client, config),
         HelpableSubCommand::Merge(command) => command.execute(github_client, config),
+        HelpableSubCommand::Search(command) => command.execute(github_client, config),
         HelpableSubCommand::Config { command } => match command {
             ConfigSubCommand::List(command) => command.execute(config),
             ConfigSubCommand::Set(mut command) => command.execute(config),

@@ -1,6 +1,6 @@
 use super::payload::PullRequestCommitPayload;
 use super::payload::PullRequestPayload;
-use crate::github::payload::{BranchPayload, ErrorPayload};
+use crate::github::payload::{BranchPayload, ErrorPayload, SearchPayload};
 use reqwest::{
     header::{HeaderMap, HeaderValue, AUTHORIZATION},
     Client, Response,
@@ -160,6 +160,18 @@ impl GithubClient {
             .get(&format!(
                 "https://api.github.com/repos/{}/branches/{}",
                 repository_name, branch,
+            ))
+            .send()
+            .unwrap()
+            .json()
+            .unwrap()
+    }
+
+    pub fn search_pull_requests(&self, repository_name: &str, term: &str) -> SearchPayload {
+        self.client
+            .get(&format!(
+                "https://api.github.com/search/issues?q={}+is:pr+repo:{}",
+                term, repository_name,
             ))
             .send()
             .unwrap()
