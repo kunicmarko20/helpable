@@ -17,6 +17,7 @@ serde_derive = "1.0.91"
 serde_json = "1.0.39"
 structopt = "0.3"
 text_io = "0.1.7"
+webbrowser = "0.5.2"
 
 [profile.release]
 codegen-units = 1

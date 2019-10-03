@@ -23,21 +23,28 @@ fn impl_choosable_pull_request(ast: &DeriveInput) -> TokenStream {
                 repository_name: &str,
             ) -> Result<u64, String> {
                 if pull_request_number.is_none() {
-                    return Self::choose(&github_client, repository_name)
-                        .and_then(|pull_request| Ok(pull_request.pull_request_number()));
+                    let pull_requests = github_client.list_pull_requests(repository_name);
+
+                    let chosen = Self::choose(
+                        pull_requests
+                            .iter()
+                            .map(|pull_request| pull_request.title())
+                            .collect(),
+                        repository_name
+                    )?;
+
+                    return Ok(pull_requests
+                        .into_iter()
+                        .find(|pull_request| pull_request.title() == chosen)
+                        .expect("Unable to find matching Pull Request.")
+                        .pull_request_number()
+                    );
                 }
 
                 Ok(pull_request_number.unwrap())
             }
 
-            fn choose(github_client: &github_client::github::GithubClient, repository_name: &str) -> Result<github_client::github::payload::PullRequestPayload, String> {
-                let pull_requests = github_client.list_pull_requests(repository_name);
-
-                let selections: Vec<&str> = pull_requests
-                    .iter()
-                    .map(|pull_request| pull_request.title())
-                    .collect();
-
+            fn choose(selections: Vec<&str>, repository_name: &str) -> Result<String, String> {
                 if selections.is_empty() {
                     return Err("No Pull Requests found in repository.".to_string());
                 }
@@ -48,13 +55,7 @@ fn impl_choosable_pull_request(ast: &DeriveInput) -> TokenStream {
                     .interact()
                     .unwrap();
 
-                let selected_title = selections[selected].to_string();
-
-                Ok(pull_requests
-                    .into_iter()
-                    .find(|pull_request| pull_request.title() == selected_title)
-                    .expect("Unable to find matching Pull Request.")
-                )
+                Ok(selections[selected].to_string())
             }
         }
     };
