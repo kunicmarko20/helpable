@@ -5,6 +5,35 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use syn::DeriveInput;
 
+#[proc_macro_derive(Confirmation)]
+pub fn confirmation(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+
+    impl_confirmation(&ast)
+}
+
+fn impl_confirmation(ast: &DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+
+    let gen = quote! {
+        impl #name {
+            fn confirmation(text: &str) -> Result<(), String> {
+                if !dialoguer::Confirmation::new()
+                    .with_text(text)
+                    .interact()
+                    .unwrap()
+                {
+                    return Err("".to_string());
+                }
+
+                Ok(())
+            }
+        }
+    };
+
+    gen.into()
+}
+
 #[proc_macro_derive(ChoosablePullRequest)]
 pub fn choosable_pull_request(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -51,6 +80,7 @@ fn impl_choosable_pull_request(ast: &DeriveInput) -> TokenStream {
 
                 let selected = dialoguer::Select::with_theme(&dialoguer::theme::ColorfulTheme::default())
                     .with_prompt("Choose Pull Request:")
+                    .default(0)
                     .items(&selections[..])
                     .interact()
                     .unwrap();
