@@ -18,9 +18,13 @@ impl Release {
 
         let response = github_client
             .create_pull_request(&config.get("repository_name"), body.to_string())
-            .unwrap();
+            .map_err(|error| error.to_string())?;
 
-        UpdateRelease::new(response.pull_request_number()).execute(github_client, config)?;
+        UpdateRelease::new(response.pull_request_number())
+            .execute(github_client, config)
+            .ok();
+
+        webbrowser::open(response.html_url()).unwrap();
 
         Ok(())
     }

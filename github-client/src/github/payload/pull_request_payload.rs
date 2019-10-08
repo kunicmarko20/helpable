@@ -4,6 +4,7 @@ use super::parts::{Base, Head};
 pub struct PullRequestPayload {
     number: u64,
     title: String,
+    html_url: String,
     base: Base,
     head: Head,
 }
@@ -23,5 +24,9 @@ impl PullRequestPayload {
 
     pub fn title(&self) -> &str {
         &self.title
+    }
+
+    pub fn html_url(&self) -> &str {
+        &self.html_url
     }
 }
