@@ -17,7 +17,8 @@ impl Release {
         });
 
         let response = github_client
-            .create_pull_request(&config.get("repository_name"), body.to_string())
+            .pull_request()
+            .create(&config.get("repository_name"), body.to_string())
             .map_err(|error| error.to_string())?;
 
         UpdateRelease::new(response.pull_request_number())

@@ -11,7 +11,8 @@ pub struct NewestCommitSha {
 impl NewestCommitSha {
     pub fn execute(&self, github_client: GithubClient, mut config: Config) -> Result<(), String> {
         let response = github_client
-            .branch_info(
+            .branch()
+            .get(
                 &config.get("repository_name"),
                 &self
                     .branch

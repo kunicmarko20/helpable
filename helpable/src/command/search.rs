@@ -14,7 +14,8 @@ impl Search {
         let repository_name = config.get("repository_name");
 
         let search_payload = github_client
-            .search_pull_requests(&repository_name, &self.term)
+            .pull_request()
+            .search(&repository_name, &self.term)
             .map_err(|error| error.to_string())?;
 
         let chosen = Self::choose(

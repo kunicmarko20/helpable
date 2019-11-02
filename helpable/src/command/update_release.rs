@@ -26,7 +26,8 @@ impl UpdateRelease {
             Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
 
         let pull_request = github_client
-            .pull_request_info(&repository_name, pull_request_number)
+            .pull_request()
+            .get(&repository_name, pull_request_number)
             .map_err(|error| error.to_string())?;
 
         if !pull_request.is_release(
@@ -61,7 +62,8 @@ impl UpdateRelease {
         });
 
         github_client
-            .update_pull_request(&repository_name, pull_request_number, body.to_string())
+            .pull_request()
+            .update(&repository_name, pull_request_number, body.to_string())
             .map_err(|error| error.to_string())?;
 
         Ok(())
@@ -76,7 +78,8 @@ impl UpdateRelease {
         let mut tickets = Vec::new();
 
         let pull_request_commits = github_client
-            .pull_request_commits(&repository_name, pull_request_number)
+            .pull_request()
+            .commits(&repository_name, pull_request_number)
             .map_err(|error| error.to_string())?;
 
         let regex = Regex::new(&format!("\\[(?P<ticket>{}-\\d+)\\].*", ticket_prefix)).unwrap();

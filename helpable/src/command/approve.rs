@@ -17,7 +17,8 @@ impl Approve {
             Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
 
         github_client
-            .approve_pull_requests(&repository_name, pull_request_number)
+            .pull_request()
+            .approve(&repository_name, pull_request_number)
             .map_err(|error| error.to_string())?;
 
         Ok(())

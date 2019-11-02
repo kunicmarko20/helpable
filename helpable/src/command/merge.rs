@@ -20,7 +20,8 @@ impl Merge {
             Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
 
         let pull_request = github_client
-            .pull_request_info(&repository_name, pull_request_number)
+            .pull_request()
+            .get(&repository_name, pull_request_number)
             .map_err(|error| error.to_string())?;
 
         let body = if Self::should_create_merge_commit(&mut config, &pull_request) {
@@ -39,7 +40,7 @@ impl Merge {
             pull_request.title().to_string()
         ))?;
 
-        let response = github_client.merge_pull_request(
+        let response = github_client.pull_request().merge(
             &repository_name,
             pull_request_number,
             body.to_string(),
