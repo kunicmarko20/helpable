@@ -61,7 +61,7 @@ impl UpdateRelease {
         pull_request_number: u64,
         ticket_prefix: String,
     ) -> String {
-        let mut title = "Release".to_string();
+        let mut title = vec!["Release".to_string()];
 
         let pull_request_commits =
             github_client.pull_request_commits(&repository_name, pull_request_number);
@@ -71,12 +71,16 @@ impl UpdateRelease {
         for pull_request_commit in pull_request_commits {
             if let Some(captures) = regex.captures(&pull_request_commit.commit_message()) {
                 if let Some(ticket) = captures.name("ticket") {
-                    title = title + " " + ticket.as_str();
+                    let ticket_string = ticket.as_str().to_owned();
+
+                    if title.contains(&ticket_string) {
+                        title.push(ticket_string);
+                    }
                 }
             }
         }
 
-        title
+        title.join(" ")
     }
 }
 
