@@ -33,19 +33,28 @@ impl UpdateRelease {
             return Err("Not a release Pull Request.".to_string());
         }
 
-        let new_title = Self::new_release_title(
+        let tickets = Self::tickets_from_commits(
             &github_client,
             &repository_name,
             pull_request_number,
             config.get("ticket_prefix"),
         );
 
+        let new_title = "Release ".to_owned() + &tickets.join(" ");
+
         if pull_request.title() == new_title {
             return Err("Nothing to update.".to_string());
         }
 
+        let pull_request_body = tickets
+            .into_iter()
+            .map(|ticket| config.get("ticket_url") + &ticket)
+            .collect::<Vec<String>>()
+            .join("\n");
+
         let body = json!({
             "title": new_title,
+            "body": pull_request_body,
         });
 
         github_client
@@ -55,13 +64,13 @@ impl UpdateRelease {
         Ok(())
     }
 
-    fn new_release_title(
+    fn tickets_from_commits(
         github_client: &GithubClient,
         repository_name: &str,
         pull_request_number: u64,
         ticket_prefix: String,
-    ) -> String {
-        let mut title = vec!["Release".to_string()];
+    ) -> Vec<String> {
+        let mut tickets = Vec::new();
 
         let pull_request_commits =
             github_client.pull_request_commits(&repository_name, pull_request_number);
@@ -73,14 +82,14 @@ impl UpdateRelease {
                 if let Some(ticket) = captures.name("ticket") {
                     let ticket_string = ticket.as_str().to_owned();
 
-                    if title.contains(&ticket_string) {
-                        title.push(ticket_string);
+                    if !tickets.contains(&ticket_string) {
+                        tickets.push(ticket_string);
                     }
                 }
             }
         }
 
-        title.join(" ")
+        tickets
     }
 }
 
