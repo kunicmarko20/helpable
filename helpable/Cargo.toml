@@ -10,7 +10,7 @@ config = "0.9"
 dialoguer = "0.4.0"
 dirs = "2.0.2"
 helpable-derive = { path = "../helpable-derive" }
-github-client = { path = "../github-client" }
+github-client = "0.1.0"
 regex = "1.2.0"
 serde = "1.0.91"
 serde_derive = "1.0.91"

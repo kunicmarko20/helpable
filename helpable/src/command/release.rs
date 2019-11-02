@@ -1,6 +1,6 @@
 use crate::command::UpdateRelease;
 use crate::config::Config;
-use github_client::github::GithubClient;
+use github_client::GithubClient;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]

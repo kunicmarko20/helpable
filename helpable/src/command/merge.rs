@@ -1,7 +1,7 @@
 use crate::config::Config;
-use github_client::github::payload::PullRequestPayload;
-use github_client::github::GithubClient;
-use github_client::github::MergeMethod;
+use github_client::payload::PullRequestPayload;
+use github_client::GithubClient;
+use github_client::MergeMethod;
 use helpable_derive::{ChoosablePullRequest, Confirmation};
 use structopt::StructOpt;
 

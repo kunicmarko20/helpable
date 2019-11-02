@@ -9,7 +9,7 @@ use crate::config::Config;
 use crate::helpable::HelpableSubCommand;
 use crate::helpable::{ConfigSubCommand, Helpable};
 use crate::structopt::StructOpt;
-use github_client::github::GithubClient;
+use github_client::GithubClient;
 
 mod command;
 mod config;

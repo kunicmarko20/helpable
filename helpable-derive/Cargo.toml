@@ -9,6 +9,6 @@ proc-macro = true
 
 [dependencies]
 dialoguer = "0.4.0"
-github-client = { path = "../github-client" }
+github-client = "0.1.0"
 syn = "1.0.5"
 quote = "1.0.2"

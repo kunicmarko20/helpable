@@ -1,5 +1,5 @@
 use crate::config::Config;
-use github_client::github::GithubClient;
+use github_client::GithubClient;
 
 #[derive(Debug, Default, StructOpt)]
 #[structopt(rename_all = "kebab-case")]

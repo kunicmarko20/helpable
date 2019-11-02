@@ -1,5 +1,5 @@
 use crate::config::Config;
-use github_client::github::GithubClient;
+use github_client::GithubClient;
 use helpable_derive::ChoosablePullRequest;
 use regex::Regex;
 

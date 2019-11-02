@@ -48,7 +48,7 @@ fn impl_choosable_pull_request(ast: &DeriveInput) -> TokenStream {
         impl #name {
             fn pull_request_number(
                 pull_request_number: Option<u64>,
-                github_client: &github_client::github::GithubClient,
+                github_client: &github_client::GithubClient,
                 repository_name: &str,
             ) -> Result<u64, String> {
                 if pull_request_number.is_none() {
