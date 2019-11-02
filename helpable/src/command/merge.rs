@@ -42,7 +42,8 @@ impl Merge {
             .unwrap();
 
         if response.status() == 405 {
-            return Err("Unable to merge, did you try to approve pull request?".to_string());
+            webbrowser::open(pull_request.html_url()).unwrap();
+            return Err("Unable to merge, opening in browser...".to_string());
         }
 
         Ok(())
