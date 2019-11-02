@@ -18,7 +18,7 @@ impl Approve {
 
         github_client
             .approve_pull_requests(&repository_name, pull_request_number)
-            .unwrap();
+            .map_err(|error| error.to_string())?;
 
         Ok(())
     }

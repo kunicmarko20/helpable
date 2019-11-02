@@ -24,7 +24,10 @@ impl UpdateRelease {
 
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
-        let pull_request = github_client.pull_request_info(&repository_name, pull_request_number);
+
+        let pull_request = github_client
+            .pull_request_info(&repository_name, pull_request_number)
+            .map_err(|error| error.to_string())?;
 
         if !pull_request.is_release(
             config.get("release_branch"),
@@ -38,7 +41,7 @@ impl UpdateRelease {
             &repository_name,
             pull_request_number,
             config.get("ticket_prefix"),
-        );
+        )?;
 
         let new_title = "Release ".to_owned() + &tickets.join(" ");
 
@@ -59,7 +62,7 @@ impl UpdateRelease {
 
         github_client
             .update_pull_request(&repository_name, pull_request_number, body.to_string())
-            .unwrap();
+            .map_err(|error| error.to_string())?;
 
         Ok(())
     }
@@ -69,11 +72,12 @@ impl UpdateRelease {
         repository_name: &str,
         pull_request_number: u64,
         ticket_prefix: String,
-    ) -> Vec<String> {
+    ) -> Result<Vec<String>, String> {
         let mut tickets = Vec::new();
 
-        let pull_request_commits =
-            github_client.pull_request_commits(&repository_name, pull_request_number);
+        let pull_request_commits = github_client
+            .pull_request_commits(&repository_name, pull_request_number)
+            .map_err(|error| error.to_string())?;
 
         let regex = Regex::new(&format!("\\[(?P<ticket>{}-\\d+)\\].*", ticket_prefix)).unwrap();
 
@@ -89,7 +93,7 @@ impl UpdateRelease {
             }
         }
 
-        tickets
+        Ok(tickets)
     }
 }
 

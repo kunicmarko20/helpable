@@ -19,7 +19,9 @@ impl Merge {
         let pull_request_number: u64 =
             Self::pull_request_number(self.pull_request_number, &github_client, &repository_name)?;
 
-        let pull_request = github_client.pull_request_info(&repository_name, pull_request_number);
+        let pull_request = github_client
+            .pull_request_info(&repository_name, pull_request_number)
+            .map_err(|error| error.to_string())?;
 
         let body = if Self::should_create_merge_commit(&mut config, &pull_request) {
             json!({
@@ -37,13 +39,15 @@ impl Merge {
             pull_request.title().to_string()
         ))?;
 
-        let response = github_client
-            .merge_pull_request(&repository_name, pull_request_number, body.to_string())
-            .unwrap();
+        let response = github_client.merge_pull_request(
+            &repository_name,
+            pull_request_number,
+            body.to_string(),
+        );
 
-        if response.status() == 405 {
+        if response.is_err() {
             webbrowser::open(pull_request.html_url()).unwrap();
-            return Err("Unable to merge, opening in browser...".to_string());
+            response.map_err(|error| error.to_string())?;
         }
 
         Ok(())

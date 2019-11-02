@@ -52,7 +52,9 @@ fn impl_choosable_pull_request(ast: &DeriveInput) -> TokenStream {
                 repository_name: &str,
             ) -> Result<u64, String> {
                 if pull_request_number.is_none() {
-                    let pull_requests = github_client.list_pull_requests(repository_name);
+                    let pull_requests = github_client
+                        .list_pull_requests(repository_name)
+                        .map_err(|error| error.to_string())?;
 
                     let chosen = Self::choose(
                         pull_requests

@@ -6,13 +6,16 @@ use reqwest::{
     Client, Response,
 };
 
-type ResultReqwest = reqwest::Result<Response>;
+pub type Result<T> = ::std::result::Result<T, ErrorPayload>;
+pub type GenericResponse = Result<Response>;
 
 pub struct GithubClient {
     client: Client,
 }
 
 impl GithubClient {
+    const BASE_URL: &'static str = "https://api.github.com/";
+
     pub fn new(token: String) -> Self {
         let mut headers = HeaderMap::new();
         headers.insert(
@@ -20,7 +23,10 @@ impl GithubClient {
             HeaderValue::from_bytes(("token ".to_string() + &token).as_bytes()).unwrap(),
         );
 
-        let client = Client::builder().default_headers(headers).build().unwrap();
+        let client = Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
 
         GithubClient { client }
     }
@@ -29,12 +35,13 @@ impl GithubClient {
         &self,
         repository_name: &str,
         body: String,
-    ) -> Result<PullRequestPayload, ErrorPayload> {
+    ) -> Result<PullRequestPayload> {
         let mut response = self
             .client
             .post(&format!(
-                "https://api.github.com/repos/{}/pulls",
-                repository_name
+                "{}repos/{}/pulls",
+                Self::BASE_URL,
+                repository_name,
             ))
             .body(body)
             .send()
@@ -52,14 +59,24 @@ impl GithubClient {
         repository_name: &str,
         pull_request_number: u64,
         body: String,
-    ) -> ResultReqwest {
-        self.client
+    ) -> GenericResponse {
+        let mut response = self
+            .client
             .patch(&format!(
-                "https://api.github.com/repos/{}/pulls/{}",
-                repository_name, pull_request_number
+                "{}repos/{}/pulls/{}",
+                Self::BASE_URL,
+                repository_name,
+                pull_request_number,
             ))
             .body(body)
             .send()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response)
     }
 
     pub fn create_comment(
@@ -67,14 +84,24 @@ impl GithubClient {
         repository_name: &str,
         issue_number: u64,
         body: String,
-    ) -> ResultReqwest {
-        self.client
+    ) -> GenericResponse {
+        let mut response = self
+            .client
             .post(&format!(
-                "https://api.github.com/repos/{}/issues/{}/comments",
-                repository_name, issue_number
+                "{}repos/{}/issues/{}/comments",
+                Self::BASE_URL,
+                repository_name,
+                issue_number,
             ))
             .body(body)
             .send()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response)
     }
 
     pub fn merge_pull_request(
@@ -82,69 +109,102 @@ impl GithubClient {
         repository_name: &str,
         pull_request_number: u64,
         body: String,
-    ) -> ResultReqwest {
-        self.client
+    ) -> GenericResponse {
+        let mut response = self
+            .client
             .put(&format!(
-                "https://api.github.com/repos/{}/pulls/{}/merge",
-                repository_name, pull_request_number
+                "{}repos/{}/pulls/{}/merge",
+                Self::BASE_URL,
+                repository_name,
+                pull_request_number,
             ))
             .body(body)
             .send()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response)
     }
 
     pub fn pull_request_info(
         &self,
         repository_name: &str,
         pull_request_number: u64,
-    ) -> PullRequestPayload {
-        self.client
+    ) -> Result<PullRequestPayload> {
+        let mut response = self
+            .client
             .get(&format!(
-                "https://api.github.com/repos/{}/pulls/{}",
-                repository_name, pull_request_number
+                "{}repos/{}/pulls/{}",
+                Self::BASE_URL,
+                repository_name,
+                pull_request_number,
             ))
             .send()
-            .unwrap()
-            .json()
-            .unwrap()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response.json().unwrap())
     }
 
     pub fn pull_request_commits(
         &self,
         repository_name: &str,
         pull_request_number: u64,
-    ) -> Vec<PullRequestCommitPayload> {
-        self.client
+    ) -> Result<Vec<PullRequestCommitPayload>> {
+        let mut response = self
+            .client
             .get(&format!(
-                "https://api.github.com/repos/{}/pulls/{}/commits",
-                repository_name, pull_request_number
+                "{}repos/{}/pulls/{}/commits",
+                Self::BASE_URL,
+                repository_name,
+                pull_request_number,
             ))
             .send()
-            .unwrap()
-            .json()
-            .unwrap()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response.json().unwrap())
     }
 
-    pub fn list_pull_requests(&self, repository_name: &str) -> Vec<PullRequestPayload> {
-        self.client
+    pub fn list_pull_requests(&self, repository_name: &str) -> Result<Vec<PullRequestPayload>> {
+        let mut response = self
+            .client
             .get(&format!(
-                "https://api.github.com/repos/{}/pulls",
-                repository_name
+                "{}repos/{}/pulls",
+                Self::BASE_URL,
+                repository_name,
             ))
             .send()
-            .unwrap()
-            .json()
-            .unwrap()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response.json().unwrap())
     }
 
     pub fn approve_pull_requests(
         &self,
         repository_name: &str,
         pull_request_number: u64,
-    ) -> ResultReqwest {
-        self.client
+    ) -> GenericResponse {
+        let mut response = self
+            .client
             .post(&format!(
-                "https://api.github.com/repos/{}/pulls/{}/reviews",
-                repository_name, pull_request_number,
+                "{}repos/{}/pulls/{}/reviews",
+                Self::BASE_URL,
+                repository_name,
+                pull_request_number,
             ))
             .body(
                 json!({
@@ -153,29 +213,50 @@ impl GithubClient {
                 .to_string(),
             )
             .send()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response)
     }
 
-    pub fn branch_info(&self, repository_name: &str, branch: &str) -> BranchPayload {
-        self.client
+    pub fn branch_info(&self, repository_name: &str, branch: &str) -> Result<BranchPayload> {
+        let mut response = self
+            .client
             .get(&format!(
-                "https://api.github.com/repos/{}/branches/{}",
-                repository_name, branch,
+                "{}repos/{}/branches/{}",
+                Self::BASE_URL,
+                repository_name,
+                branch,
             ))
             .send()
-            .unwrap()
-            .json()
-            .unwrap()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response.json().unwrap())
     }
 
-    pub fn search_pull_requests(&self, repository_name: &str, term: &str) -> SearchPayload {
-        self.client
+    pub fn search_pull_requests(&self, repository_name: &str, term: &str) -> Result<SearchPayload> {
+        let mut response = self
+            .client
             .get(&format!(
-                "https://api.github.com/search/issues?q={}+is:pr+repo:{}",
-                term, repository_name,
+                "{}search/issues?q={}+is:pr+repo:{}",
+                Self::BASE_URL,
+                term,
+                repository_name,
             ))
             .send()
-            .unwrap()
-            .json()
-            .unwrap()
+            .unwrap();
+
+        if !response.status().is_success() {
+            return Err(response.json().unwrap());
+        }
+
+        Ok(response.json().unwrap())
     }
 }
