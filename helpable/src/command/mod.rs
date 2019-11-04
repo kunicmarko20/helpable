@@ -1,5 +1,6 @@
 pub mod approve;
 pub mod config;
+pub mod jenkins;
 pub mod merge;
 pub mod newest_commit_sha;
 pub mod release;

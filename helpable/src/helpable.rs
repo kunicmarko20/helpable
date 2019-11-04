@@ -1,4 +1,5 @@
 use super::command::config::{List, Set};
+use super::command::jenkins;
 use super::command::{Approve, Merge, NewestCommitSha, Release, Search, UpdateRelease};
 
 #[derive(Debug, StructOpt)]
@@ -27,6 +28,11 @@ pub enum HelpableSubCommand {
         #[structopt(subcommand)]
         command: ConfigSubCommand,
     },
+    /// Execute Jenkins Commands
+    Jenkins {
+        #[structopt(subcommand)]
+        command: JenkinsSubCommand,
+    },
 }
 
 #[derive(Debug, StructOpt)]
@@ -35,4 +41,10 @@ pub enum ConfigSubCommand {
     List(List),
     /// Set or replace a config value
     Set(Set),
+}
+
+#[derive(Debug, StructOpt)]
+pub enum JenkinsSubCommand {
+    /// Trigger a release
+    Release(jenkins::Release),
 }

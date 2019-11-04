@@ -6,10 +6,11 @@ extern crate serde_json;
 extern crate text_io;
 
 use crate::config::Config;
-use crate::helpable::HelpableSubCommand;
 use crate::helpable::{ConfigSubCommand, Helpable};
+use crate::helpable::{HelpableSubCommand, JenkinsSubCommand};
 use crate::structopt::StructOpt;
 use github_client::GithubClient;
+use jenkins_client::{JenkinsClient, JenkinsConfig};
 
 mod command;
 mod config;
@@ -30,9 +31,25 @@ fn main() {
             ConfigSubCommand::List(command) => command.execute(config),
             ConfigSubCommand::Set(mut command) => command.execute(config),
         },
+        HelpableSubCommand::Jenkins { command } => {
+            let jenkins = jenkins_client_from_config(&mut config);
+            match command {
+                JenkinsSubCommand::Release(command) => {
+                    command.execute(github_client, config, jenkins)
+                }
+            }
+        }
     };
 
     if let Err(message) = result {
         println!("{}", message);
     }
+}
+
+pub fn jenkins_client_from_config(config: &mut Config) -> JenkinsClient {
+    JenkinsClient::new(JenkinsConfig::new(
+        config.get("jenkins_url"),
+        config.get("jenkins_username"),
+        config.get("jenkins_token"),
+    ))
 }
