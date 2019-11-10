@@ -1,5 +1,5 @@
 use super::JenkinsConfig;
-use super::Result;
+use super::Result as JenkinsResult;
 use crate::payload::build::Build;
 use reqwest::Client;
 use std::collections::HashMap;
@@ -10,12 +10,13 @@ pub struct JobClient<'a> {
 }
 
 impl<'a> JobClient<'a> {
-    pub fn last_build(&self, job_name: &str) -> Result<Build> {
+    pub fn last_build<T: Into<JobName>>(&self, job_name: T) -> JenkinsResult<Build> {
         let mut response = self
             .client
             .get(&format!(
                 "{}/job/{}/lastBuild/api/json",
-                &self.config.url, job_name,
+                &self.config.url,
+                job_name.into().0,
             ))
             .basic_auth(&self.config.username, self.config.token.clone())
             .send()
@@ -28,17 +29,20 @@ impl<'a> JobClient<'a> {
         Ok(response.json().unwrap())
     }
 
-    pub fn build_with_parameters(
+    pub fn build_with_parameters<T>(
         &self,
-        job_name: &str,
+        job_name: T,
         parameters: HashMap<String, String>,
-    ) -> Result<()> {
+    ) -> JenkinsResult<()>
+    where
+        T: Into<JobName>,
+    {
         let mut response = self
             .client
             .post(&format!(
                 "{}/job/{}/buildWithParameters?{}",
                 &self.config.url,
-                job_name,
+                job_name.into().0,
                 serde_urlencoded::to_string(parameters).map_err(|error| error.to_string())?
             ))
             .basic_auth(&self.config.username, self.config.token.clone())
@@ -52,10 +56,14 @@ impl<'a> JobClient<'a> {
         Ok(())
     }
 
-    pub fn build(&self, job_name: &str) -> Result<()> {
+    pub fn build<T: Into<JobName>>(&self, job_name: T) -> JenkinsResult<()> {
         let mut response = self
             .client
-            .post(&format!("{}/job/{}/build", &self.config.url, job_name))
+            .post(&format!(
+                "{}/job/{}/build",
+                &self.config.url,
+                job_name.into().0
+            ))
             .basic_auth(&self.config.username, self.config.token.clone())
             .send()
             .unwrap();
@@ -65,5 +73,19 @@ impl<'a> JobClient<'a> {
         }
 
         Ok(())
+    }
+}
+
+pub struct JobName(String);
+
+impl From<String> for JobName {
+    fn from(s: String) -> Self {
+        JobName(
+            s.trim_start_matches("job/")
+                .trim_start_matches("/job/")
+                .trim_start_matches('/')
+                .trim_end_matches('/')
+                .to_owned(),
+        )
     }
 }
