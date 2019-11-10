@@ -15,7 +15,8 @@ impl<'a> JobClient<'a> {
             .client
             .get(&format!(
                 "{}/job/{}/lastBuild/api/json",
-                &self.config.url,  job_name.into().0,
+                &self.config.url,
+                job_name.into().0,
             ))
             .basic_auth(&self.config.username, self.config.token.clone())
             .send()
@@ -33,7 +34,8 @@ impl<'a> JobClient<'a> {
         job_name: T,
         parameters: HashMap<String, String>,
     ) -> JenkinsResult<()>
-        where T: Into<JobName>
+    where
+        T: Into<JobName>,
     {
         let mut response = self
             .client
@@ -57,7 +59,11 @@ impl<'a> JobClient<'a> {
     pub fn build<T: Into<JobName>>(&self, job_name: T) -> JenkinsResult<()> {
         let mut response = self
             .client
-            .post(&format!("{}/job/{}/build", &self.config.url, job_name.into().0))
+            .post(&format!(
+                "{}/job/{}/build",
+                &self.config.url,
+                job_name.into().0
+            ))
             .basic_auth(&self.config.username, self.config.token.clone())
             .send()
             .unwrap();
@@ -79,7 +85,7 @@ impl From<String> for JobName {
                 .trim_start_matches("/job/")
                 .trim_start_matches('/')
                 .trim_end_matches('/')
-                .to_owned()
+                .to_owned(),
         )
     }
 }

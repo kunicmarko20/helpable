@@ -1,15 +1,16 @@
-use serde::export::fmt::Error;
-use serde::export::Formatter;
-use std::fmt::Display;
+use self::build_data::{deserialize_build_data, BuildData};
 use self::build_status::BuildStatus;
-use self::action::Action;
+use serde::Deserialize;
+use std::fmt::{Display, Error, Formatter};
 
-pub mod action;
+pub mod build_data;
 pub mod build_status;
 
 #[derive(Debug, Deserialize)]
 pub struct Build {
-    actions: Vec<Action>,
+    #[serde(deserialize_with = "deserialize_build_data")]
+    #[serde(rename = "actions")]
+    build_data: Option<BuildData>,
     building: bool,
     result: Option<BuildStatus>,
 }
@@ -25,14 +26,8 @@ impl Build {
         result.eq(&BuildStatus::Success)
     }
 
-    pub fn build_data(&self) -> Option<Action> {
-        for action in &self.actions {
-            if let Action::BuildData { .. } = action {
-                return Some(action.clone());
-            }
-        }
-
-        None
+    pub fn build_data(&self) -> &Option<BuildData> {
+        &self.build_data
     }
 
     fn message(&self) -> String {

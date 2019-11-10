@@ -2,7 +2,6 @@ use crate::config::Config;
 use github_client::GithubClient;
 use jenkins_client::JenkinsClient;
 use std::collections::HashMap;
-use jenkins_client::payload::build::action::Action;
 
 #[derive(Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -35,17 +34,17 @@ impl Release {
             )
             .map_err(|error| error.to_string())?;
 
-        let Action::BuildData { last_build_revision } = last_build.build_data().unwrap();
+        let build_data = last_build.build_data();
 
-        if last_build_revision.sha1 != response.sha() {
-            return Err(
-                format!(
+        if let Some(build_data) = build_data {
+            if build_data.sha1 != response.sha() {
+                return Err(format!(
                     "Jenkins build sha: {} doesn't match latest commit sha: {} on {} branch.",
-                    last_build_revision.sha1,
+                    build_data.sha1,
                     response.sha(),
                     config.get("release_branch")
-                )
-            );
+                ));
+            }
         }
 
         let mut parameters: HashMap<String, String> = HashMap::new();
@@ -53,9 +52,9 @@ impl Release {
 
         println!("Releasing sha: {}", response.sha());
 
-//        jenkins
-//            .job()
-//            .build_with_parameters(config.get("jenkins_build_deploy"), parameters)?;
+        jenkins
+            .job()
+            .build_with_parameters(config.get("jenkins_build_deploy"), parameters)?;
 
         Ok(())
     }
