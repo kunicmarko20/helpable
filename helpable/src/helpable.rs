@@ -45,6 +45,6 @@ pub enum ConfigSubCommand {
 
 #[derive(Debug, StructOpt)]
 pub enum JenkinsSubCommand {
-    /// Trigger a release
+    /// Trigger a Jenkins release
     Release(jenkins::Release),
 }

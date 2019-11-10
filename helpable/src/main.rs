@@ -50,6 +50,6 @@ pub fn jenkins_client_from_config(config: &mut Config) -> JenkinsClient {
     JenkinsClient::new(JenkinsConfig::new(
         config.get("jenkins_url"),
         config.get("jenkins_username"),
-        config.get("jenkins_token"),
+        config.get("jenkins_access_token"),
     ))
 }

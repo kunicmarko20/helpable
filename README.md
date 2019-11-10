@@ -13,12 +13,13 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    approve           Approve pull request
+    approve           Approve a pull request
     config            Set or view config values
-    merge             Merge pull request
+    jenkins           Execute Jenkins Commands
+    merge             Merge a pull request
     release           Create a Release pull request
     search            Search pull requests by term and open chosen one in default browser
-    sha               Newest Commit Sha
+    sha               Get newest Commit Sha
     update-release    Update Release pull request name
 ```
 
@@ -33,6 +34,12 @@ repository_name:kunicmarko20/helpable
 development_branch:development
 release_branch:master
 ticket_prefix:TEST
+ticket_url:https://jira.atlassian.net/browse/
+jenkins_access_token:1234567890
+jenkins_username:kunicmarko20
+jenkins_url:https://jenkins.io/
+jenkins_build_check:my/build
+jenkins_build_deploy:my/deploy
 ```
 
 Most of these values are mandatory. If a value is missing and you run a command,
@@ -45,6 +52,8 @@ be saved for future.
 * config
     * [list](#list)
     * [set](#set)
+* jenkins
+    * [release](#jenkins-release)
 * [merge](#merge)
 * [release](#release)
 * [search](#search)
@@ -89,6 +98,21 @@ ARGS:
     <key>      Name of the config that is modified
     <value>    New value of the config
 ```
+
+### jenkins
+
+#### jenkins release
+
+```
+Trigger a Jenkins release
+
+USAGE:
+    helpable jenkins release
+```
+
+This command fetches the latest build of `jenkins_build_check`, if the build isn't finished
+or status isn't success, command exits. If build is success, and build sha is same as latest
+sha on `release_branch` of git repository, we trigger `jenkins_build_deploy`.
 
 ### merge
 

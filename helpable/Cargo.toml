@@ -1,6 +1,6 @@
 [package]
 name = "helpable"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["kunicmarko20 <kunicmarko20@gmail.com>"]
 edition = "2018"
 
